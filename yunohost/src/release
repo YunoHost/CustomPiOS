@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+set -e
+DIR="$( realpath "$( dirname "${BASH_SOURCE[0]}" )")"
+
+export DIST_PATH=${DIR}
+export CUSTOM_PI_OS_PATH=$(< ${DIR}/custompios_path)
+
+source "$CUSTOM_PI_OS_PATH/config"
+source "$DIR/config"
+
+pushd workspace > /dev/null
+
+FILENAME=$(basename `ls . |  grep -e .img$ -e .raw$ | tail -n 1`)
+
+# Added little cleanout, if someone is stupid like me and adds .img :)
+IMG_FILENAME="${BASE_RELEASE_IMG_NAME%.img}.img"
+
+mv -v "${FILENAME}" "${IMG_FILENAME}"
+
+if [ "${BASE_RELEASE_COMPRESS}" == "yes" ]; then
+    echo "Compressing image"
+    # Default behavior if no names set
+    gzip "${IMG_FILENAME}"
+else
+    echo "Not compressing because setting is disabled"
+fi
+
+# store_true in argparse variables are either "yes" or ""
+if [ "${BASE_RELEASE_SHA256}" == "yes" ]; then
+    echo "Saving image hash type sha256"
+    if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then 
+        sha256sum "${IMG_FILENAME}.gz" > "${IMG_FILENAME}.gz.sha256"
+    else
+        sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}".sha256
+    fi
+fi
+
+popd

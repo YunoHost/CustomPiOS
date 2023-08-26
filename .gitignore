@@ -2,3 +2,9 @@ src/config.local
 src/image/*.zip
 src/image/*.xz
 **/key.json
+*/src/image/*.img
+*/src/workspace
+build.log
+output/*.img
+output/*.gz
+output/*.sha256

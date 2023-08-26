@@ -1,0 +1,110 @@
+#!/usr/bin/env bash
+# <Script Name>
+# <Description what this module does>
+# Written by <Author>
+# GPL V3
+########
+
+# Source error handling, leave this in place
+set -e
+
+source /common.sh
+install_cleanup_trap
+ulimit -c 0
+
+unpack /filesystem/yunohost /tmp/yunohost root
+
+echo "auto eth0" > /etc/network/interfaces.d/eth0.conf
+echo "allow-hotplug eth0" >> /etc/network/interfaces.d/eth0.conf
+echo "iface eth0 inet dhcp" >> /etc/network/interfaces.d/eth0.conf
+# TODO Use RFC4862 with maybe a local-link prefix
+echo " post-up ip a a fe80::42:acab/128 dev eth0" >> /etc/network/interfaces.d/eth0.conf
+
+# Disable those damn supposedly "predictive" interface names
+# c.f. https://unix.stackexchange.com/a/338730
+ln -sf /dev/null /etc/systemd/network/99-default.link
+
+echo "nameserver 8.8.8.8" > /etc/resolv.conf
+
+# We don't want the damn network-manager :/
+apt purge -y network-manager network-manager-openvpn
+
+# Prevent dhcp setting the "search" thing in /etc/resolv.conf, leads to many
+# weird stuff (e.g. with numericable) where any domain will ping >.>
+echo 'supersede domain-name "";'   >> /etc/dhcp/dhclient.conf
+echo 'supersede domain-search "";' >> /etc/dhcp/dhclient.conf
+echo 'supersede search "";       ' >> /etc/dhcp/dhclient.conf
+
+# Backports are evil
+sed -i '/backport/ s/^deb/#deb/' /etc/apt/sources.list
+
+# Avahi and mysql/mariadb needs to do some stuff which conflicts with
+# the "change the root password asap" so we disable it. In fact, now
+# that YunoHost 3.3 syncs the password with admin password at
+# postinstall we are happy with not triggering a password change at
+# first boot.  Assuming that ARM-boards won't be exposed to global
+# network right after booting the first time ...
+chage -d 99999999 root
+
+apt update --allow-releaseinfo-change
+
+# Run the install script
+wget https://install.yunohost.org/bullseye -O /tmp/yunohost_install_script
+# FIXME: Ugly hack while waiting that PR https://github.com/YunoHost/install_script/pull/75 is merged
+sed -i '/step restart_services/d' /tmp/yunohost_install_script 
+bash /tmp/yunohost_install_script -i -a -d $YNH_BUILDER_BRANCH
+[[ -e /etc/yunohost ]] || exit 1
+rm -f /var/log/yunohost-installation*
+
+if [[ $YNH_BUILDER_INSTALL_INTERNETCUBE == "yes" ]]
+then
+    cp -r /tmp/yunohost/install_internetcube /var/www/install_internetcube
+    rm -rf /var/www/install_internetcube/.git
+    pushd /var/www/install_internetcube/
+    source deploy/deploy.sh
+    popd
+fi
+
+if [[ $YNH_BUILDER_INSTALL_CLIC == "yes" ]]
+then
+    cp -r /tmp/yunohost/install_clic /var/www/install_clic
+    pushd /var/www/install_clic/
+    source deploy/deploy.sh
+    popd
+fi
+
+# disable autologin
+rm -f /etc/systemd/system/getty@.service.d/override.conf
+rm -f /etc/systemd/system/serial-getty@.service.d/override.conf
+
+# Override the first login script with our own (we don't care about desktop
+# stuff + we don't want the user to manually create a user)
+cp /tmp/yunohost/check_yunohost_is_installed.sh /etc/profile.d/check_yunohost_is_installed.sh
+dpkg-divert --divert /root/armbian-check-first-login.sh --rename /etc/profile.d/armbian-check-first-login.sh
+dpkg-divert --divert /root/armbian-motd --rename /etc/default/armbian-motd
+rm -f /etc/profile.d/armbian-check-first-login.sh
+cp /tmp/yunohost/check_first_login.sh /etc/profile.d/check_first_login.sh
+cp /tmp/yunohost/armbian-motd /etc/default/armbian-motd
+touch /root/.not_logged_in_yet
+
+# Make sure resolv.conf points to DNSmasq
+# (somehow networkmanager or something else breaks this before...)
+install -Dv /tmp/yunohost/resolv.conf /etc/resolvconf/run/resolv.conf
+rm -f /etc/resolv.conf
+ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+
+if [[ $BASE_DISTRO == "armbian" ]]; then
+  # Disable /var/log in RAM
+  sed -i 's/^ENABLED=true/ENABLED=false/' /etc/default/armbian-zram-config /etc/default/armbian-ramlog
+fi
+# Disable /tmp in RAM
+sed 's/^tmpfs/# tmpfs/g' /etc/fstab  -i
+
+apt-cache policy yunohost | grep -Po 'Installed: \K.+' > /tmp/yunohost_version
+custompios_export yunohost /tmp/yunohost_version
+
+# Cleanup
+rm -rf /var/lib/apt/lists/*
+apt clean
+# Unpack root at the end, so files are modified before
+unpack /filesystem/root /

@@ -1,0 +1,5 @@
+Place zipped Rasbian or Armbian image here.
+
+If not otherwise specified, the build script will always use the most
+recent file matching the file name pattern "*-raspios-*.img" or
+"Armbian_*.img" located here.
