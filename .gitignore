@@ -1,10 +1,7 @@
 src/config.local
-src/image/*.zip
-src/image/*.xz
+src/image
 **/key.json
-*/src/image/*.img
+*/src/image
+*/src/output
 */src/workspace
 build.log
-output/*.img
-output/*.gz
-output/*.sha256

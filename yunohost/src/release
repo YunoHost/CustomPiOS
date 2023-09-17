@@ -1,23 +1,22 @@
 #!/usr/bin/env bash
 set -e
-DIR="$( realpath "$( dirname "${BASH_SOURCE[0]}" )")"
 
-export DIST_PATH=${DIR}
-export CUSTOM_PI_OS_PATH=$(< ${DIR}/custompios_path)
+export DIR=$(dirname "${BASH_SOURCE[0]}")
+export DIST_PATH=$(realpath "$DIR")
+export ROOT_PATH=$(realpath "${DIST_PATH}/../../")
+export RELATIVE_DIST_PATH=$(realpath "${DIST_PATH}" --relative-to "${ROOT_PATH}")
 
-source "$CUSTOM_PI_OS_PATH/config"
-source "$DIR/config"
+source "${DIST_PATH}/config"
 
-pushd workspace > /dev/null
-
-FILENAME=$(basename `ls . |  grep -e .img$ -e .raw$ | tail -n 1`)
+FILENAME=$(ls -t ${DIST_PATH}/workspace/*.img | head -n 1)
 
 # Added little cleanout, if someone is stupid like me and adds .img :)
-IMG_FILENAME="${BASE_RELEASE_IMG_NAME%.img}.img"
+IMG_FILENAME="${DIST_PATH}/output/${BASE_RELEASE_IMG_NAME%.img}.img"
 
+mkdir -p "${DIST_PATH}/output"
 mv -v "${FILENAME}" "${IMG_FILENAME}"
 
-if [ "${BASE_RELEASE_COMPRESS}" == "yes" ]; then
+if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
     echo "Compressing image"
     # Default behavior if no names set
     gzip "${IMG_FILENAME}"
@@ -26,7 +25,7 @@ else
 fi
 
 # store_true in argparse variables are either "yes" or ""
-if [ "${BASE_RELEASE_SHA256}" == "yes" ]; then
+if [[ "${BASE_RELEASE_SHA256}" == "yes" ]]; then
     echo "Saving image hash type sha256"
     if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then 
         sha256sum "${IMG_FILENAME}.gz" > "${IMG_FILENAME}.gz.sha256"
@@ -34,5 +33,3 @@ if [ "${BASE_RELEASE_SHA256}" == "yes" ]; then
         sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}".sha256
     fi
 fi
-
-popd

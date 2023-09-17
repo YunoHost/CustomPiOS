@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# <Script Name>
+# <Description what this module does>
+# Written by <Author>
+# GPL V3
+########
+
+# Source error handling, leave this in place
+set -e
+
+source /common.sh
+install_cleanup_trap
+
+unpack /filesystem/internetcube /tmp/internetcube root
+
+rm -f /etc/resolv.conf
+cp /tmp/internetcube/resolv.conf.tmp /etc/resolv.conf
+
+apt update
+
+cp -r /tmp/internetcube/install /var/www/install_internetcube
+rm -rf /var/www/install_internetcube/.git
+pushd /var/www/install_internetcube/
+source deploy/deploy.sh
+popd
+
+rm -f /etc/resolv.conf
+ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+
+# Unpack root at the end, so files are modified before
+unpack /filesystem/root /

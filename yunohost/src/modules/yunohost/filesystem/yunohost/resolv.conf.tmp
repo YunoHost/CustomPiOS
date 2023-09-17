@@ -1,0 +1,4 @@
+nameserver  80.67.169.12
+nameserver  80.67.169.40
+nameserver  2001:910:800::12
+nameserver  2001:910:800::40

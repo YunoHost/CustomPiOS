@@ -16,3 +16,7 @@ apt clean
 rm -f /etc/custompios_buildbase
 rm -f /etc/${DIST_NAME,,}_version
 rm -f /etc/dist_variant
+
+if [[ -f /.dockerenv ]]; then
+  fuser -cuk /dev
+fi

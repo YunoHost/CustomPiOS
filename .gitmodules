@@ -1,6 +1,6 @@
-[submodule "yunohost/src/modules/yunohost/filesystem/yunohost/install_internetcube"]
-	path = yunohost/src/modules/yunohost/filesystem/yunohost/install_internetcube
-	url = https://github.com/labriqueinternet/install.git
-[submodule "yunohost/src/modules/yunohost/filesystem/yunohost/install_clic"]
-	path = yunohost/src/modules/yunohost/filesystem/yunohost/install_clic
+[submodule "yunohost/src/modules/clic/filesystem/clic/install"]
+	path = yunohost/src/modules/clic/filesystem/clic/install
 	url = https://framagit.org/clic/clic
+[submodule "yunohost/src/modules/internetcube/filesystem/internetcube/install"]
+	path = yunohost/src/modules/internetcube/filesystem/internetcube/install
+	url = https://github.com/labriqueinternet/install.git

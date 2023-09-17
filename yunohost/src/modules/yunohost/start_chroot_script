@@ -24,7 +24,7 @@ echo " post-up ip a a fe80::42:acab/128 dev eth0" >> /etc/network/interfaces.d/e
 # c.f. https://unix.stackexchange.com/a/338730
 ln -sf /dev/null /etc/systemd/network/99-default.link
 
-echo "nameserver 8.8.8.8" > /etc/resolv.conf
+cp /tmp/yunhohost/resolv.conf.tmp /etc/resolv.conf
 
 # We don't want the damn network-manager :/
 apt purge -y network-manager network-manager-openvpn
@@ -45,33 +45,15 @@ sed -i '/backport/ s/^deb/#deb/' /etc/apt/sources.list
 # first boot.  Assuming that ARM-boards won't be exposed to global
 # network right after booting the first time ...
 chage -d 99999999 root
+echo "root:yunohost" | chpasswd
 
 apt update --allow-releaseinfo-change
 
 # Run the install script
 wget https://install.yunohost.org/bullseye -O /tmp/yunohost_install_script
-# FIXME: Ugly hack while waiting that PR https://github.com/YunoHost/install_script/pull/75 is merged
-sed -i '/step restart_services/d' /tmp/yunohost_install_script 
 bash /tmp/yunohost_install_script -i -a -d $YNH_BUILDER_BRANCH
 [[ -e /etc/yunohost ]] || exit 1
 rm -f /var/log/yunohost-installation*
-
-if [[ $YNH_BUILDER_INSTALL_INTERNETCUBE == "yes" ]]
-then
-    cp -r /tmp/yunohost/install_internetcube /var/www/install_internetcube
-    rm -rf /var/www/install_internetcube/.git
-    pushd /var/www/install_internetcube/
-    source deploy/deploy.sh
-    popd
-fi
-
-if [[ $YNH_BUILDER_INSTALL_CLIC == "yes" ]]
-then
-    cp -r /tmp/yunohost/install_clic /var/www/install_clic
-    pushd /var/www/install_clic/
-    source deploy/deploy.sh
-    popd
-fi
 
 # disable autologin
 rm -f /etc/systemd/system/getty@.service.d/override.conf
@@ -103,8 +85,5 @@ sed 's/^tmpfs/# tmpfs/g' /etc/fstab  -i
 apt-cache policy yunohost | grep -Po 'Installed: \K.+' > /tmp/yunohost_version
 custompios_export yunohost /tmp/yunohost_version
 
-# Cleanup
-rm -rf /var/lib/apt/lists/*
-apt clean
 # Unpack root at the end, so files are modified before
 unpack /filesystem/root /

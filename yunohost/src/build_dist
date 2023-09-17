@@ -1,8 +1,36 @@
 #!/usr/bin/env bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-export DIST_PATH=${DIR}
-export CUSTOM_PI_OS_PATH=$(<${DIR}/custompios_path)
-export PATH=$PATH:$CUSTOM_PI_OS_PATH
+set -e
 
-${CUSTOM_PI_OS_PATH}/build_custom_os $@
+export DIR=$(dirname "${BASH_SOURCE[0]}")
+export DIST_PATH=$(realpath "$DIR")
+export ROOT_PATH=$(realpath "${DIST_PATH}/../../")
+export RELATIVE_DIST_PATH=$(realpath "${DIST_PATH}" --relative-to "${ROOT_PATH}")
+
+if [[ "${1}" == "docker" ]]; then
+  shift
+
+  if ! docker build $DIR -t custompios; then
+    STATUS=$?
+    echo
+    echo "Docker container build exited with code: $STATUS"
+    exit 1
+  fi
+  
+  docker run --cap-add=SYS_ADMIN --cap-add=MKNOD --cap-add=SYS_PTRACE --privileged --name custompios -v $ROOT_PATH:/opt/custompios --device /dev/loop-control -ti --rm --entrypoint /bin/bash custompios "/opt/custompios/${RELATIVE_DIST_PATH}/build_dist" $@
+  exit 0
+fi
+
+for ARG in "$@"; do
+  export $ARG
+done
+
+if [[ -n $BOARD ]]; then
+  export DIST_NAME="$BOARD"
+fi
+
+export CUSTOM_PI_OS_PATH=$(realpath "${ROOT_PATH}/src")
+export PATH="$PATH:$CUSTOM_PI_OS_PATH"
+
+${CUSTOM_PI_OS_PATH}/build_custom_os
+${DIST_PATH}/release
