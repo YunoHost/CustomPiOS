@@ -1,18 +1,22 @@
-FROM debian:bullseye-backports
+FROM debian:bookworm-backports
 
 MAINTAINER Guy Sheffer <guysoft at gmail dot com>
 
-RUN set -x \
-    && apt-get update && apt-get install -y \
+ARG DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates \
+        sudo \
         build-essential \
+        sudo \
         curl \
         git \
         wget \
         p7zip-full \
         python3 \
         binfmt-support \
-        qemu \
-        qemu-user-static/bullseye-backports \
+        qemu-system \
+        qemu-user \
+        qemu-user-static \
         sudo \
         file \
         fdisk \
@@ -21,7 +25,8 @@ RUN set -x \
         zip \
         xz-utils \
         lsof \
-    && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* \
+  && apt -qyy clean
 
 RUN ln -s /CustomPiOS/nightly_build_scripts/custompios_nightly_build /usr/bin/build
 RUN ln -s /usr/bin/python3 /usr/bin/python
