@@ -14,7 +14,7 @@ install_cleanup_trap
 unpack /filesystem/clic /tmp/clic root
 
 rm -f /etc/resolv.conf
-cp /tmp/internetcube/resolv.conf.tmp /etc/resolv.conf
+cp /tmp/clic/resolv.conf.tmp /etc/resolv.conf
 
 apt update
 

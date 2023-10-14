@@ -23,8 +23,7 @@ echo " post-up ip a a fe80::42:acab/128 dev eth0" >> /etc/network/interfaces.d/e
 # Disable those damn supposedly "predictive" interface names
 # c.f. https://unix.stackexchange.com/a/338730
 ln -sf /dev/null /etc/systemd/network/99-default.link
-
-cp /tmp/yunhohost/resolv.conf.tmp /etc/resolv.conf
+cp /tmp/yunohost/resolv.conf.tmp /etc/resolv.conf
 
 # We don't want the damn network-manager :/
 apt purge -y network-manager network-manager-openvpn
