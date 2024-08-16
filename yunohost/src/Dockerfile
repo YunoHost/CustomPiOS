@@ -1,28 +1,32 @@
-FROM ubuntu:jammy
+FROM debian:bookworm-backports
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 RUN apt update && apt -y dist-upgrade && \
     apt install -y \
-        binfmt-support \
-        btrfs-progs \
+        ca-certificates \
+        sudo \
         build-essential \
         curl \
-        fdisk \
-        file \
         git \
-        jq \
-        lsof \
-        p7zip-full \
-        psmisc \
-        python3 \
-        qemu-utils \
-        qemu-user-static \
-        sudo \ 
         wget \
+        p7zip-full \
+        python3 \
+        binfmt-support \
+        qemu-system \
+        qemu-user \
+        qemu-user-static \
+        file \
+        fdisk \
+        btrfs-progs \
+        jq \
+        zip \
         xz-utils \
-        zip && \
+        lsof \
+        psmisc && \
     rm -rf /var/lib/apt/lists/*
+
+RUN ln -s /usr/bin/python3 /usr/bin/python
 
 ENV LANG='en_US.UTF-8' LANGUAGE='en_US:en' LC_ALL='en_US.UTF-8' TERM=screen
 

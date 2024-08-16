@@ -1,6 +1,8 @@
 #!/bin/sh
 
-. /etc/armbian-release
+if [[ ! -e /etc/armbian-release ]]; then
+  . /etc/armbian-release
+fi
 
 if [ -n "$BASH_VERSION" ] && [ "$-" != "${-#*i}" ]; then
     # Display reboot recommendation if necessary

@@ -23,6 +23,7 @@ echo " post-up ip a a fe80::42:acab/128 dev eth0" >> /etc/network/interfaces.d/e
 # Disable those damn supposedly "predictive" interface names
 # c.f. https://unix.stackexchange.com/a/338730
 ln -sf /dev/null /etc/systemd/network/99-default.link
+rm -f /etc/resolv.conf
 cp /tmp/yunohost/resolv.conf.tmp /etc/resolv.conf
 
 # We don't want the damn network-manager :/
@@ -77,6 +78,8 @@ ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
 if [[ $BASE_DISTRO == "armbian" ]]; then
   # Disable /var/log in RAM
   sed -i 's/^ENABLED=true/ENABLED=false/' /etc/default/armbian-zram-config /etc/default/armbian-ramlog
+  # Set CPU governor to performance to avoid random hangs
+  sed -i 's/^GOVERNOR=.*$/GOVERNOR=performance/' /etc/default/cpufrequtils
 fi
 # Disable /tmp in RAM
 sed 's/^tmpfs/# tmpfs/g' /etc/fstab  -i
