@@ -51,7 +51,7 @@ if [[ "${BASE_DISTRO}" == "armbian" ]]; then
   [[ -n $BASE_ZIP_IMG ]] || export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
 elif [[ "${BASE_DISTRO}" == "raspbian" ]]; then
   export BASE_IMAGE_ENLARGEROOT=500
-  [[ -n $BASE_ZIP_IMG ]] || export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/yunohost,*-raspios}-*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
+  [[ -n $BASE_ZIP_IMG ]] || export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/{yunohost,*-raspios}-*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
 elif [[ "${BASE_DISTRO}" == "olimex" ]]; then
   # The root partiton of the image filesystem, 2 for raspbian, 1 for armbian
   export BASE_ROOT_PARTITION=1
