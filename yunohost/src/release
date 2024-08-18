@@ -11,9 +11,9 @@ source "${DIST_PATH}/config"
 FILENAME=$(ls -t ${DIST_PATH}/workspace/*.img | head -n 1)
 
 # Added little cleanout, if someone is stupid like me and adds .img :)
-IMG_FILENAME="${DIST_PATH}/output/${BASE_RELEASE_IMG_NAME%.img}.img"
+IMG_FILENAME="${DIST_PATH}/output/${BOARD}/${BASE_RELEASE_IMG_NAME%.img}.img"
 
-mkdir -p "${DIST_PATH}/output"
+mkdir -p "$(dirname ${IMG_FILENAME})"
 mv -v "${FILENAME}" "${IMG_FILENAME}"
 
 if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
