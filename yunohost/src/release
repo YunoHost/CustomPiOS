@@ -35,8 +35,9 @@ fi
 if [[ "${BASE_RELEASE_ARCHIVE}" == "yes" ]]; then
     echo "Archiving old images"
     mkdir -p "${IMG_DIR}/archives"
-    find "${IMG_DIR}" -name "${YNH_BUILDER_INSTALLER}_*_${BOARD}-*" \
+    find "${IMG_DIR}" -maxdepth 1 \
+      -name "${YNH_BUILDER_INSTALLER}_*_${BOARD}-*" \
       -a ! -name "${IMG_FILENAME}" \
       -a ! -name "${IMG_FILENAME}.sha256" \
-      -exec mv {} "${IMG_DIR}/archives" \;
+      -exec mv {} "${IMG_DIR}/archives/" \;
 fi
