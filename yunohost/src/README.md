@@ -6,7 +6,7 @@ It is recommended to build the ARM images from a Docker container.
 ## Usage
 
 Download the base image according to your board in the `./image` directory:
-- Raspberry Pi 3 or 4: https://downloads.raspberrypi.org/raspios_lite_arm64_latest
+- Raspberry Pi 3 or 4: https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2023-05-03/2023-05-03-raspios-bullseye-arm64-lite.img.xz
 - Olimex Lime2: https://archive.armbian.com/lime2/archive/Armbian_23.02.2_Lime2_bullseye_current_5.15.93_minimal.img.xz
 - Olimex LimeA64: http://images.olimex.com/release/a64/A64-OLinuXino-bullseye-base-20231106-081613.img.7z
 - Odroid N2/N2+: https://archive.armbian.com/odroidn2/archive/Armbian_23.02.2_Odroidn2_bullseye_current_6.1.11_minimal.img.xz
