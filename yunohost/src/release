@@ -12,24 +12,31 @@ FILENAME=$(ls -t ${DIST_PATH}/workspace/*.img | head -n 1)
 
 # Added little cleanout, if someone is stupid like me and adds .img :)
 IMG_FILENAME="${DIST_PATH}/output/${BOARD}/${BASE_RELEASE_IMG_NAME%.img}.img"
+IMG_DIR="$(dirname "${IMG_FILENAME}")"
 
-mkdir -p "$(dirname ${IMG_FILENAME})"
+mkdir -p "${IMG_DIR}"
 mv -v "${FILENAME}" "${IMG_FILENAME}"
 
 if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
     echo "Compressing image"
     # Default behavior if no names set
     gzip "${IMG_FILENAME}"
+    IMG_FILENAME="${IMG_FILENAME}.gz"
 else
     echo "Not compressing because setting is disabled"
 fi
 
 # store_true in argparse variables are either "yes" or ""
 if [[ "${BASE_RELEASE_SHA256}" == "yes" ]]; then
-    echo "Saving image hash type sha256"
-    if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then 
-        sha256sum "${IMG_FILENAME}.gz" > "${IMG_FILENAME}.gz.sha256"
-    else
-        sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}".sha256
-    fi
+    echo "Saving image hash type sha256" 
+    sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}.sha256"
+fi
+
+if [[ "${BASE_RELEASE_ARCHIVE}" == "yes" ]]; then
+    echo "Archiving old images"
+    mkdir -p "${IMG_DIR}/archives"
+    find "${IMG_DIR}" -name "${YNH_BUILDER_INSTALLER}_*_${BOARD}-*" \
+      -a ! -name "${IMG_FILENAME}" \
+      -a ! -name "${IMG_FILENAME}.sha256" \
+      -exec mv {} "${IMG_DIR}/archives" \;
 fi
