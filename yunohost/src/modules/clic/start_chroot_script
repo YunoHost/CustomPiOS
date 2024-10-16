@@ -19,6 +19,7 @@ cp /tmp/clic/resolv.conf.tmp /etc/resolv.conf
 apt update
 
 cp -r /tmp/clic/install /var/www/install_clic
+rm -rf /var/www/install_clic/.git
 pushd /var/www/install_clic/
 source deploy/deploy.sh
 popd
