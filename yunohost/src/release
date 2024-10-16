@@ -11,33 +11,53 @@ source "${DIST_PATH}/config"
 FILENAME=$(ls -t ${DIST_PATH}/workspace/*.img | head -n 1)
 
 # Added little cleanout, if someone is stupid like me and adds .img :)
-IMG_FILENAME="${DIST_PATH}/output/${BOARD}/${BASE_RELEASE_IMG_NAME%.img}.img"
-IMG_DIR="$(dirname "${IMG_FILENAME}")"
+IMG_PATH="${DIST_PATH}/output/${BOARD}/${BASE_RELEASE_IMG_NAME%.img}.img"
+IMG_DIR="$(dirname "${IMG_PATH}")"
+IMG_FILENAME="$(basename "${IMG_PATH}")"
+IMG_LATEST_FILENAME="${YNH_BUILDER_INSTALLER}_latest"
 
 mkdir -p "${IMG_DIR}"
-mv -v "${FILENAME}" "${IMG_FILENAME}"
+pushd "${IMG_DIR}" > /dev/null
+    mv -v "${FILENAME}" "${IMG_FILENAME}"
 
-if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
-    echo "Compressing image"
-    # Default behavior if no names set
-    gzip "${IMG_FILENAME}"
-    IMG_FILENAME="${IMG_FILENAME}.gz"
-else
-    echo "Not compressing because setting is disabled"
-fi
+    if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
+        echo "Compressing image"
+        # Default behavior if no names set
+        if [[ "${BASE_RELEASE_KEEP_COMPRESS}" ]]; then
+            gzip -k "${IMG_FILENAME}"
+        else
+            gzip "${IMG_FILENAME}"
+        fi
+        IMG_FILENAME="${IMG_FILENAME}.gz"
+        IMG_LATEST_FILENAME="${IMG_LATEST_FILENAME}.gz"
+    else
+        echo "Not compressing because setting is disabled"
+    fi
 
-# store_true in argparse variables are either "yes" or ""
-if [[ "${BASE_RELEASE_SHA256}" == "yes" ]]; then
-    echo "Saving image hash type sha256" 
-    sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}.sha256"
-fi
+    # store_true in argparse variables are either "yes" or ""
+    if [[ "${BASE_RELEASE_SHA256}" == "yes" ]]; then
+        echo "Saving image hash type sha256"
+        sha256sum "${IMG_FILENAME}" > "${IMG_FILENAME}.sha256"
+    else
+        echo "Not creating sha256 checksum because setting is disabled"
+    fi
 
-if [[ "${BASE_RELEASE_ARCHIVE}" == "yes" ]]; then
-    echo "Archiving old images"
-    mkdir -p "${IMG_DIR}/archives"
-    find "${IMG_DIR}" -maxdepth 1 \
-      -name "${YNH_BUILDER_INSTALLER}_*_${BOARD}-*" \
-      -a ! -name "${IMG_FILENAME}" \
-      -a ! -name "${IMG_FILENAME}.sha256" \
-      -exec mv {} "${IMG_DIR}/archives/" \;
-fi
+    if [[ "${BASE_RELEASE_ARCHIVE}" == "yes" ]]; then
+        echo "Archiving old images"
+        mkdir -p "${IMG_DIR}/archives"
+        find "${IMG_DIR}" -maxdepth 1 \
+          -name "${YNH_BUILDER_INSTALLER}_*_${BOARD}-*" \
+          -a ! -name "${IMG_FILENAME}" \
+          -a ! -name "${IMG_FILENAME}.sha256" \
+          -a ! -name "*_latest.*" \
+          -exec mv -v {} "${IMG_DIR}/archives/" \;
+    fi
+
+    if [[ "${BASE_RELEASE_LATEST}" == "yes" ]]; then
+        ln -sf "${IMG_FILENAME}" "${IMG_LATEST_FILENAME}"
+        if [[ "${BASE_RELEASE_SHA256}" == "yes" ]]; then
+            cp "${IMG_FILENAME}.sha256" "${IMG_LATEST_FILENAME}.sha256"
+            sed -i "s/${IMG_FILENAME}/${IMG_LATEST_FILENAME}/g" "${IMG_LATEST_FILENAME}.sha256"
+        fi
+    fi
+popd > /dev/null
