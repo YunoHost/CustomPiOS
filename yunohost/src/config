@@ -33,6 +33,7 @@ if [[ -z $BASE_DISTRO ]]; then
     *'rpi'*)
       export BASE_DISTRO=raspbian
       export BASE_ARCH=arm64
+      export BASE_BOOT_MOUNT_PATH=boot
       ;;
     *)
       >&2 echo "Unable to detect base distribution (armbian, olimex or raspbian) for board $DIST_NAME."
