@@ -15,17 +15,19 @@ IMG_PATH="${DIST_PATH}/output/${BOARD}/${BASE_RELEASE_IMG_NAME%.img}.img"
 IMG_DIR="$(dirname "${IMG_PATH}")"
 IMG_FILENAME="$(basename "${IMG_PATH}")"
 IMG_EXTENSION="img"
-IMG_LATEST_FILENAME="${YNH_BUILDER_INSTALLER}_latest"
+IMG_LATEST_FILENAME="${YNH_BUILDER_INSTALLER}_latest.img"
 
 mkdir -p "${IMG_DIR}"
-pushd "${IMG_DIR}" > /dev/null
+pushd "${IMG_DIR}"
     mv -v "${FILENAME}" "${IMG_FILENAME}"
 
     if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
         echo "Compressing image"
         # Default behavior if no names set
         if [[ "${BASE_RELEASE_KEEP_COMPRESS}" == "yes" ]]; then
+            echo "Keeping uncompressed image"
             gzip -k "${IMG_FILENAME}"
+            mv -v ${IMG_FILENAME} "${DIST_PATH}/image/${IMG_FILENAME}"
         else
             gzip "${IMG_FILENAME}"
         fi
@@ -56,6 +58,7 @@ pushd "${IMG_DIR}" > /dev/null
     fi
 
     if [[ "${BASE_RELEASE_ARCHIVE_RETENTION}" -gt 0 ]]; then
+        echo "Cleaning old archives"
         for file_ext in "${IMG_EXTENSION}" "${IMG_EXTENSION}.sha256"; do
           archives=$(ls -t ./archives/${YNH_BUILDER_INSTALLER}_*.${file_ext} | tail -n+${BASE_RELEASE_ARCHIVE_RETENTION})
           if [[ -n "${archives}" ]]; then
@@ -65,10 +68,11 @@ pushd "${IMG_DIR}" > /dev/null
     fi
 
     if [[ "${BASE_RELEASE_LATEST}" == "yes" ]]; then
-        ln -sf "${IMG_FILENAME}" "${IMG_LATEST_FILENAME}"
+        echo "Linking latest image"
+        ln -sfv "${IMG_FILENAME}" "${IMG_LATEST_FILENAME}"
         if [[ "${BASE_RELEASE_SHA256}" == "yes" ]]; then
-            cp "${IMG_FILENAME}.sha256" "${IMG_LATEST_FILENAME}.sha256"
+            cp -v "${IMG_FILENAME}.sha256" "${IMG_LATEST_FILENAME}.sha256"
             sed -i "s/${IMG_FILENAME}/${IMG_LATEST_FILENAME}/g" "${IMG_LATEST_FILENAME}.sha256"
         fi
     fi
-popd > /dev/null
+popd
