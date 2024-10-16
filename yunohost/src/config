@@ -1,7 +1,9 @@
 [[ -n $YNH_BUILDER_INSTALLER ]] || export YNH_BUILDER_INSTALLER=yunohost
 [[ -n $YNH_BUILDER_BRANCH ]] || export YNH_BUILDER_BRANCH=stable
 [[ -n $BASE_RELEASE_COMPRESS ]] || export BASE_RELEASE_COMPRESS=no
+[[ -n $BASE_RELEASE_KEEP_COMPRESS ]] || export BASE_RELEASE_KEEP_COMPRESS=no
 [[ -n $BASE_RELEASE_SHA256 ]] || export BASE_RELEASE_SHA256=no
+[[ -n $BASE_RELEASE_LATEST ]] || export BASE_RELEASE_LATEST=no
 # [[ -n $BASE_ARCH ]] || export BASE_ARCH=arm64
   
 export BASE_WORKSPACE="${DIST_PATH}/workspace"
