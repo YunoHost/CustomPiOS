@@ -23,7 +23,7 @@ pushd "${IMG_DIR}" > /dev/null
     if [[ "${BASE_RELEASE_COMPRESS}" == "yes" ]]; then
         echo "Compressing image"
         # Default behavior if no names set
-        if [[ "${BASE_RELEASE_KEEP_COMPRESS}" ]]; then
+        if [[ "${BASE_RELEASE_KEEP_COMPRESS}" == "yes" ]]; then
             gzip -k "${IMG_FILENAME}"
         else
             gzip "${IMG_FILENAME}"
