@@ -14,6 +14,7 @@ FILENAME=$(ls -t ${DIST_PATH}/workspace/*.img | head -n 1)
 IMG_PATH="${DIST_PATH}/output/${BOARD}/${BASE_RELEASE_IMG_NAME%.img}.img"
 IMG_DIR="$(dirname "${IMG_PATH}")"
 IMG_FILENAME="$(basename "${IMG_PATH}")"
+IMG_EXTENSION="img"
 IMG_LATEST_FILENAME="${YNH_BUILDER_INSTALLER}_latest"
 
 mkdir -p "${IMG_DIR}"
@@ -29,6 +30,7 @@ pushd "${IMG_DIR}" > /dev/null
             gzip "${IMG_FILENAME}"
         fi
         IMG_FILENAME="${IMG_FILENAME}.gz"
+        IMG_EXTENSION="${IMG_EXTENSION}.gz"
         IMG_LATEST_FILENAME="${IMG_LATEST_FILENAME}.gz"
     else
         echo "Not compressing because setting is disabled"
@@ -51,6 +53,15 @@ pushd "${IMG_DIR}" > /dev/null
           -a ! -name "${IMG_FILENAME}.sha256" \
           -a ! -name "*_latest.*" \
           -exec mv -v {} "${IMG_DIR}/archives/" \;
+    fi
+
+    if [[ "${BASE_RELEASE_ARCHIVE_RETENTION}" -gt 0 ]]; then
+        for file_ext in "${IMG_EXTENSION}" "${IMG_EXTENSION}.sha256"; do
+          archives=$(ls -t ./archives/${YNH_BUILDER_INSTALLER}_*.${file_ext} | tail -n+${BASE_RELEASE_ARCHIVE_RETENTION})
+          if [[ -n "${archives}" ]]; then
+            rm -v $archives
+          fi
+        done
     fi
 
     if [[ "${BASE_RELEASE_LATEST}" == "yes" ]]; then
