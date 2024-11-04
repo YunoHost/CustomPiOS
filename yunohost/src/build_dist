@@ -33,4 +33,4 @@ export CUSTOM_PI_OS_PATH=$(realpath "${ROOT_PATH}/src")
 export PATH="$PATH:$CUSTOM_PI_OS_PATH"
 
 ${CUSTOM_PI_OS_PATH}/build_custom_os
-${DIST_PATH}/release
+${DIST_PATH}/release | tee "${BUILD_DIST}/release.log"

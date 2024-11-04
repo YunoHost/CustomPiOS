@@ -50,9 +50,10 @@ echo "root:yunohost" | chpasswd
 apt update --allow-releaseinfo-change
 
 # Run the install script
-wget https://install.yunohost.org/bullseye -O /tmp/yunohost_install_script
+# FIXME (titus during bookworm release 2024-10-30): dist should be a variable here?
+wget https://install.yunohost.org/bookworm -O /tmp/yunohost_install_script
 bash /tmp/yunohost_install_script -i -a -d $YNH_BUILDER_BRANCH
-[[ -e /etc/yunohost ]] || exit 1
+[[ -e /etc/yunohost ]] || { tail -n 300 /var/log/yunohost-intallation*; exit 1; }
 rm -f /var/log/yunohost-installation*
 
 # disable autologin
@@ -83,6 +84,12 @@ if [[ $BASE_DISTRO == "armbian" ]]; then
 fi
 # Disable /tmp in RAM
 sed 's/^tmpfs/# tmpfs/g' /etc/fstab  -i
+
+if [[ $BASE_DISTRO == "raspbian" ]]; then
+  # Enable sshd
+  systemctl enable ssh.service
+fi
+
 
 apt-cache policy yunohost | grep -Po 'Installed: \K.+' > /tmp/yunohost_version
 custompios_export yunohost /tmp/yunohost_version
