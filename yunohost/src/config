@@ -31,8 +31,29 @@ if [[ -z $BASE_DISTRO ]]; then
       export BASE_DISTRO=armbian
       export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Lime{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
       ;;
-    *'odroid'*)
+    *'odroidhc4'*)
       export BASE_DISTRO=armbian
+      export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Odroidhc4{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
+      ;;
+    *'odroidm1'*)
+      export BASE_DISTRO=armbian
+      export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Odroidm1{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
+      ;;
+    *'odroidn2'*)
+      export BASE_DISTRO=armbian
+      export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Odroidn2{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
+      ;;
+    *'orangepi5-plus'*)
+      export BASE_DISTRO=armbian
+      export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Orangepi5-plus{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
+      ;;
+    *'pine64quartz64a'*)
+      export BASE_DISTRO=armbian
+      export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Pine64quartz64b{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
+      ;;
+    *'pine64quartz64b'*)
+      export BASE_DISTRO=armbian
+      export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Pine64quartz64b{,2}_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
       ;;
     *'rpi'*)
       export BASE_DISTRO=raspbian
