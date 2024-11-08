@@ -14,6 +14,7 @@ ulimit -c 0
 
 unpack /filesystem/yunohost /tmp/yunohost root
 
+mkdir -p /etc/network/interfaces.d
 echo "auto eth0" > /etc/network/interfaces.d/eth0.conf
 echo "allow-hotplug eth0" >> /etc/network/interfaces.d/eth0.conf
 echo "iface eth0 inet dhcp" >> /etc/network/interfaces.d/eth0.conf
