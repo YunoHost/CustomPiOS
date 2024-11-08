@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [[ ! -e /etc/armbian-release ]]; then
+if [[ -e /etc/armbian-release ]]; then
   . /etc/armbian-release
 fi
 
