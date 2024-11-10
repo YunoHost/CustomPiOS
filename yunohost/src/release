@@ -26,10 +26,10 @@ pushd "${IMG_DIR}"
         # Default behavior if no names set
         if [[ "${BASE_RELEASE_KEEP_COMPRESS}" == "yes" ]]; then
             echo "Keeping uncompressed image"
-            gzip -k "${IMG_FILENAME}"
+            gzip -k -f "${IMG_FILENAME}"
             mv -v ${IMG_FILENAME} "${DIST_PATH}/image/${IMG_FILENAME}"
         else
-            gzip "${IMG_FILENAME}"
+            gzip -f "${IMG_FILENAME}"
         fi
         IMG_FILENAME="${IMG_FILENAME}.gz"
         IMG_EXTENSION="${IMG_EXTENSION}.gz"
