@@ -74,8 +74,13 @@ touch /root/.not_logged_in_yet
 # Make sure resolv.conf points to DNSmasq
 # (somehow networkmanager or something else breaks this before...)
 install -Dv /tmp/yunohost/resolv.conf /etc/resolvconf/run/resolv.conf
-rm -f /etc/resolv.conf
+mv /etc/resolv.conf /etc/resolv.dnsmasq
 ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
+rm -f /.resolvconf_link
+
+echo "resolv-file=/etc/resolv.dnsmasq" >>/etc/default/dnsmasq
+echo "IGNORE_RESOLVCONF=yes" >>/etc/default/dnsmasq
+
 
 if [[ $BASE_DISTRO == "armbian" ]]; then
   # Disable /var/log in RAM
