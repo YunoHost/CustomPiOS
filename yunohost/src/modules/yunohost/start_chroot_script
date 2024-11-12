@@ -78,7 +78,7 @@ mv /etc/resolv.conf /etc/resolv.dnsmasq
 ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
 rm -f /.resolvconf_link
 
-echo "resolv-file=/etc/resolv.dnsmasq" >>/etc/default/dnsmasq
+echo "resolv-file=/etc/resolv.dnsmasq" >>/etc/dnsmasq.conf
 echo "IGNORE_RESOLVCONF=yes" >>/etc/default/dnsmasq
 
 
