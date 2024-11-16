@@ -94,6 +94,10 @@ sed 's/^tmpfs/# tmpfs/g' /etc/fstab  -i
 if [[ $BASE_DISTRO == "raspbian" ]]; then
   # Enable sshd
   systemctl enable ssh.service
+  sed -i -r 's/^[#\s]*PermitRootLogin\s+.+$/PermitRootLogin yes/g' /etc/ssh/sshd_config
+
+  # Disable creation of first user
+  systemctl disable userconfig
 fi
 
 
