@@ -76,7 +76,7 @@ touch /root/.not_logged_in_yet
 install -Dv /tmp/yunohost/resolv.conf /etc/resolvconf/run/resolv.conf
 mv /etc/resolv.conf /etc/resolv.dnsmasq
 ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
-rm -f /.resolvconf_link
+rm -f /.resolvconf_link /etc/resolv.conf.orig
 
 echo "resolv-file=/etc/resolv.dnsmasq" >>/etc/dnsmasq.conf
 echo "IGNORE_RESOLVCONF=yes" >>/etc/default/dnsmasq
