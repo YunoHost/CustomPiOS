@@ -38,7 +38,7 @@ if [[ -z $BASE_DISTRO ]]; then
       ;;
     *'odroidxu4'*)
       export BASE_DISTRO=armbian
-      export BASE_ARCH=aarch64
+      export BASE_ARCH=armv7l
       export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*_Odroidxu4_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
       ;;
     *'odroidm1'*)
