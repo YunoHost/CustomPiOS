@@ -17,12 +17,21 @@ unpack /filesystem/yunohost /tmp/yunohost root
 # Boring fix because rpi kernel can't be upgraded in chroot/qemu
 apt-mark hold linux-headers-rpi-v8 linux-image-rpi-2712 linux-image-rpi-v8 linux-headers-rpi-2712 || true
 
+# Backports are evil
+sed -i '/backport/ s/^deb/#deb/' /etc/apt/sources.list
+
+# Update apt cache
+apt update --allow-releaseinfo-change
+
+# Reconfigure network to use the 'good old' /etc/network stuff instead of Networkmanager ...
+echo 'source /etc/network/interfaces.d/*' > /etc/network/interfaces
 mkdir -p /etc/network/interfaces.d
-echo "auto eth0" > /etc/network/interfaces.d/eth0.conf
-echo "allow-hotplug eth0" >> /etc/network/interfaces.d/eth0.conf
-echo "iface eth0 inet dhcp" >> /etc/network/interfaces.d/eth0.conf
-# TODO Use RFC4862 with maybe a local-link prefix
-echo " post-up ip a a fe80::42:acab/128 dev eth0" >> /etc/network/interfaces.d/eth0.conf
+cat << EOF > /etc/network/interfaces.d/eth0
+auto eth0
+allow-hotplug eth0
+iface eth0 inet dhcp
+  post-up ip a a fe80::42:acab/128 dev eth0
+EOF
 
 # Disable those damn supposedly "predictive" interface names
 # c.f. https://unix.stackexchange.com/a/338730
@@ -30,17 +39,16 @@ ln -sf /dev/null /etc/systemd/network/99-default.link
 rm -f /etc/resolv.conf
 cp /tmp/yunohost/resolv.conf.tmp /etc/resolv.conf
 
-# We don't want the damn network-manager :/
 apt purge -y network-manager network-manager-openvpn
+# ifupdown is the stuff bringing the 'networking' service that uses /etc/network/interfaces
+apt install -y ifupdown
+systemctl enable networking
 
 # Prevent dhcp setting the "search" thing in /etc/resolv.conf, leads to many
 # weird stuff (e.g. with numericable) where any domain will ping >.>
 echo 'supersede domain-name "";'   >> /etc/dhcp/dhclient.conf
 echo 'supersede domain-search "";' >> /etc/dhcp/dhclient.conf
 echo 'supersede search "";       ' >> /etc/dhcp/dhclient.conf
-
-# Backports are evil
-sed -i '/backport/ s/^deb/#deb/' /etc/apt/sources.list
 
 # Avahi and mysql/mariadb needs to do some stuff which conflicts with
 # the "change the root password asap" so we disable it. In fact, now
@@ -50,8 +58,6 @@ sed -i '/backport/ s/^deb/#deb/' /etc/apt/sources.list
 # network right after booting the first time ...
 chage -d 99999999 root
 echo "root:yunohost" | chpasswd
-
-apt update --allow-releaseinfo-change
 
 # Run the install script
 # FIXME (titus during bookworm release 2024-10-30): dist should be a variable here?
