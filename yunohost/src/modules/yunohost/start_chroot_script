@@ -36,8 +36,6 @@ EOF
 # Disable those damn supposedly "predictive" interface names
 # c.f. https://unix.stackexchange.com/a/338730
 ln -sf /dev/null /etc/systemd/network/99-default.link
-rm -f /etc/resolv.conf
-cp /tmp/yunohost/resolv.conf.tmp /etc/resolv.conf
 
 apt purge -y network-manager network-manager-openvpn
 # ifupdown is the stuff bringing the 'networking' service that uses /etc/network/interfaces
@@ -86,11 +84,6 @@ install -Dv /tmp/yunohost/resolv.conf /etc/resolvconf/run/resolv.conf
 rm /etc/resolv.conf 
 ln -s /etc/resolvconf/run/resolv.conf /etc/resolv.conf
 rm -f /.resolvconf_link /etc/resolv.conf.orig
-
-# setup a temporary resolv configuration for dnsmasq (will be changed by yunohost post install)
-cp /tmp/yunohost/resolv.conf.tmp /etc/resolv.dnsmasq
-echo "resolv-file=/etc/resolv.dnsmasq" >>/etc/dnsmasq.conf
-echo "IGNORE_RESOLVCONF=yes" >>/etc/default/dnsmasq
 
 if [[ $BASE_DISTRO == "armbian" ]]; then
   # Disable /var/log in RAM
