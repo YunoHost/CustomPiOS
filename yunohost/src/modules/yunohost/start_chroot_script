@@ -14,6 +14,9 @@ ulimit -c 0
 
 unpack /filesystem/yunohost /tmp/yunohost root
 
+# Boring fix because rpi kernel can't be upgraded in chroot/qemu
+apt-mark hold linux-headers-rpi-v8 linux-image-rpi-2712 linux-image-rpi-v8 linux-headers-rpi-2712 || true
+
 mkdir -p /etc/network/interfaces.d
 echo "auto eth0" > /etc/network/interfaces.d/eth0.conf
 echo "allow-hotplug eth0" >> /etc/network/interfaces.d/eth0.conf
@@ -100,6 +103,9 @@ if [[ $BASE_DISTRO == "raspbian" ]]; then
   # Disable creation of first user
   systemctl disable userconfig
 fi
+
+# Revert previous boring fix because rpi kernel can't be upgraded in chroot/qemu
+apt-mark unhold linux-headers-rpi-v8 linux-image-rpi-2712 linux-image-rpi-v8 linux-headers-rpi-2712 || true
 
 
 apt-cache policy yunohost | grep -Po 'Installed: \K.+' > /tmp/yunohost_version
