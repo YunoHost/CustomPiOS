@@ -15,7 +15,7 @@ ${bold}${blue}
 ${normal}${bold}
  To finish the installation, you should run the postinstallation.
  You can find documentation about it on :${normal}
-     https://yunohost.org/postinstall
+     https://doc.yunohost.org/fr/category/after-installation
 ${normal}${bold}
  You can run it from the command line interface with :${normal}
      $ yunohost tools postinstall
