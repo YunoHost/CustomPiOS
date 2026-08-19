@@ -1,4 +1,5 @@
 [[ -n $YNH_BUILDER_INSTALLER ]] || export YNH_BUILDER_INSTALLER=yunohost
+[[ -n $YNH_BUILDER_DISTRIBUTION ]] || export YNH_BUILDER_DISTRIBUTION=bookworm
 [[ -n $YNH_BUILDER_BRANCH ]] || export YNH_BUILDER_BRANCH=stable
 [[ -n $BASE_RELEASE_COMPRESS ]] || export BASE_RELEASE_COMPRESS=no
 [[ -n $BASE_RELEASE_KEEP_COMPRESS ]] || export BASE_RELEASE_KEEP_COMPRESS=no
@@ -12,7 +13,7 @@ export BASE_WORKSPACE="${DIST_PATH}/workspace"
 
 export DIST_VERSION=0.1.0
 export BASE_ADD_USER=no
-export BASE_IMAGE_RESIZEROOT=100
+export BASE_IMAGE_RESIZEROOT=0
 export BASE_SSH_ENABLE="no"
 
 if [[ -z $DIST_NAME ]]; then
@@ -23,8 +24,8 @@ fi
 if [[ -z $BASE_DISTRO ]]; then
   case $DIST_NAME in
     *'limeA64'*)
-      export BASE_DISTRO=olimex
-      export BASE_ARCH=arm64
+      export BASE_DISTRO=armbian
+      export BASE_ARCH=aarch64
       export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/{Armbian_*_Lime-a64_*,A64-OLinuXino-*}.{zip,7z,xz,img} 2>/dev/null | head -n 1)
       ;;
     *'lime'*)
@@ -84,7 +85,7 @@ if [[ "${BASE_DISTRO}" == "armbian" ]]; then
   # The root partiton of the image filesystem, 2 for raspbian, 1 for armbian
   export BASE_ROOT_PARTITION=1
   export BASE_IMAGE_RASPBIAN=no
-  export BASE_IMAGE_ENLARGEROOT=1000
+  export BASE_IMAGE_ENLARGEROOT=750
   [[ -n $BASE_ZIP_IMG ]] || export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/Armbian_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
 elif [[ "${BASE_DISTRO}" == "raspbian" ]]; then
   export BASE_IMAGE_ENLARGEROOT=500
@@ -93,7 +94,7 @@ elif [[ "${BASE_DISTRO}" == "olimex" ]]; then
   # The root partiton of the image filesystem, 2 for raspbian, 1 for armbian
   export BASE_ROOT_PARTITION=1
   export BASE_IMAGE_RASPBIAN=no
-  export BASE_IMAGE_ENLARGEROOT=1000
+  export BASE_IMAGE_ENLARGEROOT=750
   [[ -n $BASE_ZIP_IMG ]] || export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/*-OLinuXino_*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
 fi
 
@@ -101,10 +102,12 @@ if [[ "${YNH_BUILDER_INSTALLER}" == "internetcube" ]]; then
   export YNH_BUILDER_INSTALL_INTERNETCUBE=yes
   export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/yunohost_*_${DIST_NAME}-*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
   export MODULES="base(internetcube)"
+  export BASE_IMAGE_ENLARGEROOT=100
 elif [[ "${YNH_BUILDER_INSTALLER}" == "clic" ]]; then
   export YNH_BUILDER_INSTALL_CLIC=yes
   export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/yunohost_*_${DIST_NAME}-*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
   export MODULES="base(clic)"
+  export BASE_IMAGE_ENLARGEROOT=100
 else
   export MODULES="base(yunohost)"
 fi

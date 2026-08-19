@@ -58,9 +58,8 @@ chage -d 99999999 root
 echo "root:yunohost" | chpasswd
 
 # Run the install script
-# FIXME (titus during bookworm release 2024-10-30): dist should be a variable here?
-wget https://install.yunohost.org/bookworm -O /tmp/yunohost_install_script
-bash /tmp/yunohost_install_script -i -a -d $YNH_BUILDER_BRANCH
+wget https://install.yunohost.org/$YNH_BUILDER_DISTRIBUTION -O /tmp/yunohost_install_script
+bash /tmp/yunohost_install_script -f -i -a -d $YNH_BUILDER_BRANCH
 [[ -e /etc/yunohost ]] || { tail -n 300 /var/log/yunohost-intallation*; exit 1; }
 rm -f /var/log/yunohost-installation*
 
