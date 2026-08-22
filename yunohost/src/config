@@ -102,12 +102,12 @@ if [[ "${YNH_BUILDER_INSTALLER}" == "internetcube" ]]; then
   export YNH_BUILDER_INSTALL_INTERNETCUBE=yes
   export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/yunohost_*_${DIST_NAME}-*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
   export MODULES="base(internetcube)"
-  export BASE_IMAGE_ENLARGEROOT=100
+  export BASE_IMAGE_ENLARGEROOT=200
 elif [[ "${YNH_BUILDER_INSTALLER}" == "clic" ]]; then
   export YNH_BUILDER_INSTALL_CLIC=yes
   export BASE_ZIP_IMG=$(ls -t ${DIST_PATH}/image/yunohost_*_${DIST_NAME}-*.{zip,7z,xz,img} 2>/dev/null | head -n 1)
   export MODULES="base(clic)"
-  export BASE_IMAGE_ENLARGEROOT=100
+  export BASE_IMAGE_ENLARGEROOT=200
 else
   export MODULES="base(yunohost)"
 fi
